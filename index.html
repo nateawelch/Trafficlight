@@ -1,0 +1,91 @@
+<html>
+
+<head>
+    <title>ArkaLights!!</title>
+</head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="index.css">
+
+<body>
+    <div class="container">
+        <div style="float: left;">
+            <div>
+                <iframe type="text/html" frameborder="0" width="640" height="530" src="https://video.nest.com/embedded/live/7i0Z8m4yzY?autoplay=1"></iframe>
+            </div>
+            <h3>Clicking a light or the keys "r", "y","g" will control it</h3>
+            <h3>Please turn it off by pressing "space" when you're done.</h3>
+            <h3><a target="_blank" href="http://www.arkatechture.com/blog/office-intelligence-the-arkalight">View the blogpost!!</a></h3>
+        </div>
+        <div id="arkalight" style="float:right">
+            <div class="light-container" id="red-light" onclick="setJust('red')">
+                <div class="light red-off" id="red"></div>
+            </div>
+            <div class="light-container" id="yellow-light" onclick="setJust('yellow')">
+                <div class="light yellow-off" id="yellow"></div>
+            </div>
+            <div class="light-container" id="green-light" onclick="setJust('green')">
+                <div class="light green-off" id="green"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener('keydown', function(event) {
+        switch (event.keyCode) {
+            case 32:
+                turnOff("all");
+                break;
+            case 82:
+                setJust("red");
+                break;
+            case 89:
+                setJust("yellow");
+                break;
+            case 71:
+                setJust("green");
+                break;
+        }
+
+    });
+
+    function turnOff(light) {
+        $.get("https://jiy8fwbi1l.execute-api.us-east-1.amazonaws.com/prod/" + light + "/off", {}, function(data) {
+            $("#red").addClass("red-off").removeClass("red-on")
+            $("#yellow").addClass("yellow-off").removeClass("yellow-on")
+            $("#green").addClass("green-off").removeClass("green-on");
+        });
+    }
+    var current = "none"
+    function setJust(light) {
+        if(light===current){
+            turnOff("all");
+            current="none"
+            return;
+        }
+        current=light;
+        $.get("https://jiy8fwbi1l.execute-api.us-east-1.amazonaws.com/prod/" + light + "/just", {}, function(data) {
+
+            var light2 = light === "green" ? "red" : (light === "red" ? "yellow" : "green")
+            var light3 = light2 === "green" ? "red" : (light2 === "red" ? "yellow" : "green")
+            $("#" + light).addClass(light + "-on").removeClass(light + "-off");
+            $("#" + light2).addClass(light2 + "-off").removeClass(light2 + "-on");
+            $("#" + light3).addClass(light3 + "-off").removeClass(light3 + "-on");
+        });
+
+    }
+    var interval = function() {
+        intId = setInterval(function() {
+            $.get("https://jiy8fwbi1l.execute-api.us-east-1.amazonaws.com/prod", {}, function(response) {
+                $("#red").addClass("red-" + (response.red ? "on" : "off")).removeClass("red-" + (response.red ? "off" : "on"));
+                $("#yellow").addClass("yellow-" + (response.yellow ? "on" : "off")).removeClass("yellow-" + (response.yellow ? "off" : "on"));
+                $("#green").addClass("green-" + (response.green ? "on" : "off")).removeClass("green-" + (response.green ? "off" : "on"));
+            });
+        }, 500);
+    }
+    var intId = 0
+    interval();
+    </script>
+</body>
+
+</html>

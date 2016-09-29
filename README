@@ -1,0 +1,31 @@
+
+
+/:light/:power
+	Type: GET
+	Payload: ":light" is the light to change ('green', 'yellow', 'red', or 'all')
+		 ":power" is one of three states
+			 "on": Turns the light on
+			 "off": Turns the light off
+			 "just": Turns the light on and turns others off NOTE: Not available for 'all', nothing will happen.
+				If just is given, you may also set two GET paramters that will cycle the light:
+					frequency: How often to cycle off/on, in milliseconds. NOTE: Please don't set frequency lower than 25 millis!!
+					millis: How long to cycle it, in milliseconds.
+
+Examples:
+	localhost:3000/red/on
+		Will turn the red light on
+
+	localhost:3000/green/just
+		Will turn red/yellow off and green on
+
+	localhost:3000/all/off
+		Will turn all lights off
+
+	localhost:3000/yellow/just?frequency=100&millis=1000
+		Will turn red/green off and cycle yellow on/off for 1 second every 100 milliseconds
+
+	localhost:3000/all/just?frequency=25&millis=5000
+		Nothing will happen because "just" is only available for the individual lights
+
+	localhost:3000/
+		Just returns a webpage that calls the on/off api with qwe and asd
